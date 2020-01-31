@@ -24,6 +24,7 @@
 #include "cartographer/common/make_unique.h"
 #include "cartographer/common/math.h"
 #include "cartographer/io/file_writer.h"
+#include "cartographer/io/color.h"
 #include "cartographer/io/points_processor.h"
 #include "cartographer/io/points_processor_pipeline_builder.h"
 #include "cartographer/io/proto_stream.h"
@@ -124,7 +125,22 @@ std::unique_ptr<carto::io::PointsBatch> HandleMessage(
         (tracking_to_map * sensor_to_tracking).cast<float>();
     points_batch->points.push_back(sensor_to_map *
                                    point_cloud.points[i].head<3>());
+    
+    /* Since the points_batch structure doesn't have a field for the
+     *  color of a point, we just save this value to a field named
+     *  intensities and copy it to the points color here.
+     */
+    float intensity_float = point_cloud.intensities[i];
+    int rgb = *reinterpret_cast<int*>(&intensity_float);
+    float r = float((rgb & 0xff0000) >> 4*4) / 255.f;
+    float g = float((rgb & 0xff00) >> 2*4) / 255.f;
+    float b = float(rgb & 0xff) / 255.f;
+    carto::io::FloatColor f{ {r, g, b} };
+    points_batch->colors.push_back(f);
+
+    // This of course renders the intensities field rather useless.
     points_batch->intensities.push_back(point_cloud.intensities[i]);
+
     // We use the last transform for the origin, which is approximately correct.
     points_batch->origin = sensor_to_map * Eigen::Vector3f::Zero();
   }
