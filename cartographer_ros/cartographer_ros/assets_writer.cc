@@ -131,7 +131,7 @@ std::unique_ptr<carto::io::PointsBatch> HandleMessage(
      *  intensities and copy it to the points color here.
      */
     float intensity_float = point_cloud.intensities[i];
-    int rgb = *reinterpret_cast<int*>(&intensity_float);
+    uint32_t rgb = *reinterpret_cast<int*>(&intensity_float);
     float r = float((rgb & 0xff0000) >> 4*4) / 255.f;
     float g = float((rgb & 0xff00) >> 2*4) / 255.f;
     float b = float(rgb & 0xff) / 255.f;

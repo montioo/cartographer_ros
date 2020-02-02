@@ -185,6 +185,19 @@ std::tuple<::cartographer::sensor::PointCloudWithIntensities,
            ::cartographer::common::Time>
 ToPointCloudWithIntensities(const sensor_msgs::PointCloud2& message) {
   PointCloudWithIntensities point_cloud;
+
+  // We now check for color. As the pointcloud can have an intensity field
+  // AND an rgb field, we will move both over from the ros msg to the cartographer.
+  // Normal pointclouds either have intensity or color, but as the one we are
+  // using is constructed from a laserscanner and camera combined, we have both.
+  if (PointCloud2HasField(message, "rgb")) {
+    pcl::PointCloud<pcl::PointXYZRGB> pcl_point_cloud;
+    pcl::fromROSMsg(message, pcl_point_cloud);
+    for (const auto& point: pcl_point_cloud) {
+      point_cloud.colors.push_back(point.rgb);
+    }
+  }
+  
   // We check for intensity field here to avoid run-time warnings if we pass in
   // a PointCloud2 without intensity.
   if (PointCloud2HasField(message, "intensity")) {
