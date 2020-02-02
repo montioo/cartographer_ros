@@ -12,11 +12,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-============================
-Cartographer ROS Integration
-============================
+====================================
+Colored Cartographer ROS Integration
+====================================
 
 |build| |docs| |license|
+
+
+This fork's features
+====================
+
+This fork enables cartographer to handle not only pointclouds with intensities
+but also those who come with color information. In the specific usecase this fork
+was created for, two Velodyne LiDARs as well as a consumer 360 Degree camera where
+used. Before feeding the pointcloud data into cartographer, the xyz information
+of each point was used to determine the point's color in the camera's video.
+
+Cartographer would then output a reconstruction of the environment around the robot
+which not only represented the shape of a room but also showed its colors.
 
 Purpose
 =======
@@ -28,8 +41,21 @@ configurations. This project provides Cartographer's ROS integration.
 .. _Cartographer: https://github.com/googlecartographer/cartographer
 .. _SLAM: https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping
 
-Getting started
-===============
+Updated install instructions
+============================
+
+The installation process is alomst as straight forward as described in the
+`official cartographer documentation <https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html>`_.
+But make sure to use the `.rosinstall` file for this fork of cartographer after 
+initializing the ROS workspace.
+
+.. code-block:: bash
+
+    wstool merge -t src https://raw.githubusercontent.com/montioo/cartographer_ros/release-1.0/cartographer_ros.rosinstall
+
+
+Official documentation
+======================
 
 * Learn to use Cartographer with ROS at `our Read the Docs site`_.
 * You can ask a question by `creating an issue`_.
